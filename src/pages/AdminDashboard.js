@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import API from '../services/api';
+import API from '../api/axios';
 import { toast } from 'react-toastify';
 
 const AdminDashboard = () => {
@@ -16,7 +16,7 @@ const AdminDashboard = () => {
     e.preventDefault();
     try {
       const res = await API.post('/projects', projectForm);
-      toast.success(res.data.message);
+      toast.success(res.data.message || 'Project added successfully!');
       setProjectForm({ title: '', imageUrl: '', description: '' });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to add project');
@@ -28,7 +28,7 @@ const AdminDashboard = () => {
     e.preventDefault();
     try {
       const res = await API.post('/services', serviceForm);
-      toast.success(res.data.message);
+      toast.success(res.data.message || 'Service added successfully!');
       setServiceForm({ title: '', icon: '', description: '' });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to add service');
