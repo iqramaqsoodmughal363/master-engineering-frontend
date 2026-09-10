@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+// Localhost ho toh local URL, warna Vercel ka live backend URL use karega
+const baseURL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000/api'
+  : 'https://master-engineering-api.vercel.app/api';
+
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: baseURL,
 });
 
 API.interceptors.request.use((config) => {
