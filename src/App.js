@@ -19,6 +19,18 @@ import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
+// Debug check to locate which component is causing undefined/React Error #130
+console.log("Home:", Home);
+console.log("About:", About);
+console.log("Services:", Services);
+console.log("Gallery:", Gallery);
+console.log("GalleryDetail:", GalleryDetail);
+console.log("Contact:", Contact);
+console.log("Login:", Login);
+console.log("Register:", Register);
+console.log("AdminDashboard:", AdminDashboard);
+console.log("ProtectedRoute:", ProtectedRoute);
+
 function App() {
   return (
     <AuthProvider>
