@@ -3,14 +3,25 @@ import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useContext(AuthContext);
+  const auth = useContext(AuthContext);
 
-  if (loading) {
-    return <div className="text-center py-20 font-semibold">Loading...</div>;
+  // Agar context load ho raha hai
+  if (!auth || auth.loading) {
+    return <div className="text-center py-20 font-semibold text-gray-600">Loading...</div>;
   }
 
-  // Sirf Admin (aapki email ya admin role wala) hi access kar sakega
-  const isAdmin = user && (user.role === 'admin' || user.email === 'iqra03010511199@gmail.com');
+  const user = auth.user;
+
+  // Agar user login nahi hai toh login page par bhej dein
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Check karein ke user admin hai ya aap ki specific email hai
+  const userEmail = user.email || '';
+  const userRole = user.role || '';
+  
+  const isAdmin = userRole === 'admin' || userEmail.toLowerCase() === 'iqra03010511199@gmail.com';
 
   if (!isAdmin) {
     return <Navigate to="/login" replace />;
