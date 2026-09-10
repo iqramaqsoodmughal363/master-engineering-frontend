@@ -2,8 +2,8 @@ import React, { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext();
 
-// Production Vercel Backend URL
-const API_URL = 'https://aster-engineering-backend.vercel.app';
+// Correct Production Vercel Backend URL
+const API_URL = 'https://master-engineering-api.vercel.app';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
