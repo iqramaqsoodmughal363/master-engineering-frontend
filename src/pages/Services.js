@@ -1,12 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FaCog, FaCut, FaIndustry, FaTools, FaWrench, FaPencilAlt, 
   FaTimes, FaCheckCircle, FaArrowRight, FaWhatsapp 
 } from 'react-icons/fa';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 
 const Services = () => {
+  const [loading, setLoading] = useState(true);
   const [selectedService, setSelectedService] = useState(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const services = [
     {
@@ -107,24 +117,9 @@ const Services = () => {
     }
   ];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 40 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut" }
-    }
-  };
+  if (loading) {
+    return <LoadingSpinner text="Loading Engineering Services..." />;
+  }
 
   return (
     <motion.div
@@ -154,16 +149,10 @@ const Services = () => {
         </motion.div>
 
         {/* Services Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service) => (
             <motion.div
               key={service.id}
-              variants={cardVariants}
               whileHover={{ 
                 y: -6,
                 transition: { duration: 0.2 }
@@ -211,7 +200,7 @@ const Services = () => {
               </div>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       </div>
 
       {/* Modal */}
