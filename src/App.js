@@ -1,5 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
@@ -12,6 +14,10 @@ import GalleryDetail from './pages/GalleryDetail';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
+
+// Admin Imports
+import AdminDashboard from './pages/AdminDashboard';
+import ProtectedRoute from './components/common/ProtectedRoute';
 
 function App() {
   return (
@@ -29,10 +35,22 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+
+              {/* Admin Protected Route */}
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </main>
           <Footer />
           <WhatsAppButton />
+          {/* Toast Notifications Container */}
+          <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
         </div>
       </Router>
     </AuthProvider>
