@@ -1,56 +1,152 @@
 import React, { useState } from 'react';
-import ImageUpload from '../components/common/ImageUpload';
-import { FaImages, FaCloudUploadAlt, FaSignOutAlt } from 'react-icons/fa';
+import API from '../services/api';
+import { toast } from 'react-toastify';
 
 const AdminDashboard = () => {
-  const [uploadedImages, setUploadedImages] = useState([]);
+  const [activeTab, setActiveTab] = useState('project');
+  
+  // Project/Gallery Form State
+  const [projectForm, setProjectForm] = useState({ title: '', imageUrl: '', description: '' });
+  
+  // Service Form State
+  const [serviceForm, setServiceForm] = useState({ title: '', icon: '', description: '' });
 
-  const handleUploadSuccess = (url) => {
-    setUploadedImages((prev) => [url, ...prev]);
+  // Handle Project Submit
+  const handleProjectSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await API.post('/projects', projectForm);
+      toast.success(res.data.message);
+      setProjectForm({ title: '', imageUrl: '', description: '' });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to add project');
+    }
+  };
+
+  // Handle Service Submit
+  const handleServiceSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await API.post('/services', serviceForm);
+      toast.success(res.data.message);
+      setServiceForm({ title: '', icon: '', description: '' });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to add service');
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Admin Header */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">Admin Control Panel</h1>
-            <p className="text-sm text-gray-500">Manage site content and uploaded media</p>
-          </div>
-          <span className="bg-orange-100 text-orange-800 text-xs font-semibold px-3 py-1 rounded-full">
-            Admin Mode
-          </span>
+    <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+        <h2 className="text-2xl font-bold text-primary mb-6 text-center">Admin Management Panel</h2>
+        
+        {/* Tab Switcher */}
+        <div className="flex justify-center gap-4 mb-8">
+          <button
+            onClick={() => setActiveTab('project')}
+            className={`px-6 py-2.5 rounded-lg font-semibold transition-all ${
+              activeTab === 'project' ? 'bg-secondary text-white shadow-md' : 'bg-gray-100 text-gray-600'
+            }`}
+          >
+            Add Gallery Project
+          </button>
+          <button
+            onClick={() => setActiveTab('service')}
+            className={`px-6 py-2.5 rounded-lg font-semibold transition-all ${
+              activeTab === 'service' ? 'bg-secondary text-white shadow-md' : 'bg-gray-100 text-gray-600'
+            }`}
+          >
+            Add New Service
+          </button>
         </div>
 
-        {/* Dashboard Content */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Left Side: Upload Section */}
-          <div className="md:col-span-1">
-            <ImageUpload onUploadSuccess={handleUploadSuccess} />
-          </div>
-
-          {/* Right Side: Uploaded Images Grid */}
-          <div className="md:col-span-2 bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <FaImages className="text-orange-600" /> Recent Uploads
-            </h2>
-
-            {uploadedImages.length === 0 ? (
-              <p className="text-gray-400 text-sm text-center py-10">
-                No new images uploaded in this session.
-              </p>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {uploadedImages.map((imgUrl, index) => (
-                  <div key={index} className="relative group rounded-lg overflow-hidden border border-gray-200">
-                    <img src={imgUrl} alt={`Upload ${index}`} className="w-full h-32 object-cover" />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+        {/* Project Form */}
+        {activeTab === 'project' ? (
+          <form onSubmit={handleProjectSubmit} className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-700">Upload Project to Gallery</h3>
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Project Title</label>
+              <input
+                type="text"
+                value={projectForm.title}
+                onChange={(e) => setProjectForm({ ...projectForm, title: e.target.value })}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:outline-none"
+                placeholder="e.g. Mechanical Part Design"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Image URL</label>
+              <input
+                type="text"
+                value={projectForm.imageUrl}
+                onChange={(e) => setProjectForm({ ...projectForm, imageUrl: e.target.value })}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:outline-none"
+                placeholder="Paste direct image link here"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Description</label>
+              <textarea
+                value={projectForm.description}
+                onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:outline-none"
+                placeholder="Short description of the project"
+                rows="3"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-secondary text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition-all shadow-md"
+            >
+              Upload Project
+            </button>
+          </form>
+        ) : (
+          /* Service Form */
+          <form onSubmit={handleServiceSubmit} className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-700">Add New Service</h3>
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Service Title</label>
+              <input
+                type="text"
+                value={serviceForm.title}
+                onChange={(e) => setServiceForm({ ...serviceForm, title: e.target.value })}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:outline-none"
+                placeholder="e.g. CNC Machining"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Icon Name (Optional)</label>
+              <input
+                type="text"
+                value={serviceForm.icon}
+                onChange={(e) => setServiceForm({ ...serviceForm, icon: e.target.value })}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:outline-none"
+                placeholder="e.g. FaTools"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Description</label>
+              <textarea
+                value={serviceForm.description}
+                onChange={(e) => setServiceForm({ ...serviceForm, description: e.target.value })}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:outline-none"
+                placeholder="Detailed service description"
+                rows="3"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-secondary text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition-all shadow-md"
+            >
+              Add Service
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
