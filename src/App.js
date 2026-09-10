@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './context/AuthContext';
@@ -15,21 +15,9 @@ import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
-// Admin Imports
+// Admin Imports with Safety Fallback
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/common/ProtectedRoute';
-
-// Debug check to locate which component is causing undefined/React Error #130
-console.log("Home:", Home);
-console.log("About:", About);
-console.log("Services:", Services);
-console.log("Gallery:", Gallery);
-console.log("GalleryDetail:", GalleryDetail);
-console.log("Contact:", Contact);
-console.log("Login:", Login);
-console.log("Register:", Register);
-console.log("AdminDashboard:", AdminDashboard);
-console.log("ProtectedRoute:", ProtectedRoute);
 
 function App() {
   return (
@@ -48,20 +36,25 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
 
-              {/* Admin Protected Route */}
+              {/* Safe Admin Protected Route */}
               <Route
                 path="/admin/dashboard"
                 element={
-                  <ProtectedRoute>
-                    <AdminDashboard />
-                  </ProtectedRoute>
+                  typeof ProtectedRoute !== 'undefined' && typeof AdminDashboard !== 'undefined' ? (
+                    <ProtectedRoute>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  ) : (
+                    <div className="text-center py-20 text-red-600 font-bold">
+                      Error: Admin component is missing or not exported properly!
+                    </div>
+                  )
                 }
               />
             </Routes>
           </main>
           <Footer />
           <WhatsAppButton />
-          {/* Toast Notifications Container */}
           <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
         </div>
       </Router>
