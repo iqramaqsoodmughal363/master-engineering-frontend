@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext, isAdminUser } from '../../context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
   const auth = useContext(AuthContext);
@@ -17,13 +17,7 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Check karein ke user admin hai ya aap ki specific email hai
-  const userEmail = user.email || '';
-  const userRole = user.role || '';
-  
-  const isAdmin = userRole === 'admin' || userEmail.toLowerCase() === 'iqra03010511199@gmail.com';
-
-  if (!isAdmin) {
+  if (!isAdminUser(user)) {
     return <Navigate to="/login" replace />;
   }
 

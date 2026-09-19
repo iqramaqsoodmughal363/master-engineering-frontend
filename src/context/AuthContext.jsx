@@ -2,8 +2,25 @@ import React, { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext();
 
-// Correct Production Vercel Backend URL
-const API_URL = 'https://master-engineering-api.vercel.app';
+const API_URL = process.env.REACT_APP_API_URL || 'https://aster-engineering-backend.vercel.app';
+export const ADMIN_EMAILS = [
+  'masterengineeringworks@gmail.com',
+  'iqra03010511199@gmail.com',
+];
+
+export const isAdminUser = (user) => {
+  const email = (user?.email || '').trim().toLowerCase();
+  return user?.role?.toLowerCase() === 'admin' || ADMIN_EMAILS.includes(email);
+};
+
+const readResponse = async (response) => {
+  const text = await response.text();
+  try {
+    return text ? JSON.parse(text) : {};
+  } catch {
+    return { message: text };
+  }
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -29,7 +46,7 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify(userData),
       });
 
-      const data = await response.json();
+      const data = await readResponse(response);
 
       if (!response.ok) {
         throw new Error(data.message || 'Registration failed');
@@ -52,17 +69,23 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      const data = await readResponse(response);
 
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data.message || `Login failed (${response.status})`);
       }
 
       // User state aur localStorage update
       setUser(data.user);
       localStorage.setItem('user', JSON.stringify(data.user));
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
       return data;
     } catch (error) {
+      if (error instanceof TypeError) {
+        throw new Error('Unable to reach the server. Please try again.');
+      }
       throw error;
     }
   };
@@ -71,6 +94,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   return (

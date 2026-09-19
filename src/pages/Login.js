@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaEnvelope, FaLock, FaFacebook, FaArrowRight } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext, isAdminUser } from '../context/AuthContext';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -28,11 +28,11 @@ const Login = () => {
     setErrorMsg('');
 
     try {
-      await login(formData.email, formData.password);
+      const data = await login(formData.email.trim(), formData.password);
       toast.success('Successfully logged in!');
-      navigate('/'); // Login hone ke baad Home par redirect
+      navigate(isAdminUser(data.user) ? '/admin/dashboard' : '/');
     } catch (err) {
-      const errMsg = err.response?.data?.message || 'Invalid email or password.';
+      const errMsg = err.message || 'Invalid email or password.';
       setErrorMsg(errMsg);
       toast.error(errMsg);
     } finally {

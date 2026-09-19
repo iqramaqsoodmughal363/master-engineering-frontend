@@ -3,6 +3,8 @@ import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://aster-engineering-backend.vercel.app';
+
 const AdminDashboard = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -23,6 +25,10 @@ const AdminDashboard = () => {
   // Lists
   const [projects, setProjects] = useState([]);
   const [services, setServices] = useState([]);
+  const authHeaders = () => {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
 
   // Fetch existing data
   useEffect(() => {
@@ -32,7 +38,7 @@ const AdminDashboard = () => {
 
   const fetchProjects = async () => {
     try {
-      const res = await fetch('https://aster-engineering-backend.vercel.app/api/projects');
+      const res = await fetch(`${API_URL}/api/projects`, { headers: authHeaders() });
       const data = await res.json();
       if (res.ok) setProjects(data);
     } catch (err) {
@@ -42,7 +48,7 @@ const AdminDashboard = () => {
 
   const fetchServices = async () => {
     try {
-      const res = await fetch('https://aster-engineering-backend.vercel.app/api/services');
+      const res = await fetch(`${API_URL}/api/services`, { headers: authHeaders() });
       const data = await res.json();
       if (res.ok) setServices(data);
     } catch (err) {
@@ -54,9 +60,9 @@ const AdminDashboard = () => {
   const handleProjectSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('https://aster-engineering-backend.vercel.app/api/projects', {
+      const res = await fetch(`${API_URL}/api/projects`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify({ title: projectTitle, imageUrl: projectImageUrl, description: projectDesc })
       });
       const data = await res.json();
@@ -78,9 +84,9 @@ const AdminDashboard = () => {
   const handleServiceSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('https://aster-engineering-backend.vercel.app/api/services', {
+      const res = await fetch(`${API_URL}/api/services`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify({ title: serviceTitle, icon: serviceIcon, description: serviceDesc })
       });
       const data = await res.json();
