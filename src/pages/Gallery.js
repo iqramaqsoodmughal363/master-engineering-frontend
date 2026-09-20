@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 import { projectsData } from '../date/projectsData';
 import API from '../api/axios';
+import { AuthContext, isAdminUser } from '../context/AuthContext';
 
 const Gallery = () => {
   const [filter, setFilter] = useState('All');
   const [allProjects, setAllProjects] = useState(projectsData);
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+  const canAddToCart = Boolean(user) && !isAdminUser(user);
 
   const categories = ['All', 'Manufacturing', 'Heavy Repair', 'Structural', 'Blades', 'Bladder Machines', 'Custom Built'];
 
@@ -39,6 +42,11 @@ const Gallery = () => {
     : allProjects.filter(p => p.category.toLowerCase() === filter.toLowerCase());
 
   const handleCartAction = async (project, orderNow = false) => {
+    if (!canAddToCart) {
+      toast.info(user ? 'Admins can manage orders but cannot use the customer cart.' : 'Please sign in to add items to your cart.');
+      if (!user) navigate('/login');
+      return;
+    }
     const token = localStorage.getItem('token');
     if (!token) {
       toast.info('Please sign in to add items to your cart.');
@@ -125,10 +133,10 @@ const Gallery = () => {
                 <span className="inline-block mt-1 text-xs bg-secondary/10 text-secondary px-3 py-1 rounded-full">
                   {project.category}
                 </span>
-                <div className="flex gap-2 mt-3" onClick={(event) => event.preventDefault()}>
+                {canAddToCart && <div className="flex gap-2 mt-3" onClick={(event) => event.preventDefault()}>
                   <button onClick={() => handleCartAction(project)} className="flex-1 py-2 bg-secondary text-white rounded text-xs font-semibold">Add to Cart</button>
                   <button onClick={() => handleCartAction(project, true)} className="flex-1 py-2 bg-primary text-white rounded text-xs font-semibold">Order Now</button>
-                </div>
+                </div>}
               </div>
             </Link>
           </motion.div>

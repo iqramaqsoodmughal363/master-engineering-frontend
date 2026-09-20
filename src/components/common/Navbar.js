@@ -14,7 +14,7 @@ const Navbar = () => {
     { name: 'Services', path: '/services' },
     { name: 'Gallery', path: '/gallery' },
     { name: 'Contact', path: '/contact' },
-    ...(user ? [{ name: 'Dashboard', path: isAdminUser(user) ? '/admin/dashboard' : '/dashboard' }, { name: 'Cart', path: '/cart' }] : [{ name: 'Login', path: '/login' }]),
+    ...(user ? [{ name: 'Dashboard', path: isAdminUser(user) ? '/admin/dashboard' : '/dashboard' }, ...(isAdminUser(user) ? [] : [{ name: 'Cart', path: '/cart' }])] : [{ name: 'Login', path: '/login' }]),
   ];
 
   const isActive = (path) => location.pathname === path;
