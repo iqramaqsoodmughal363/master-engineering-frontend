@@ -26,6 +26,7 @@ const AdminDashboard = () => {
   const [projects, setProjects] = useState([]);
   const [services, setServices] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [customerCarts, setCustomerCarts] = useState([]);
   const authHeaders = () => {
     const token = localStorage.getItem('token');
     return token ? { Authorization: `Bearer ${token}` } : {};
@@ -36,7 +37,18 @@ const AdminDashboard = () => {
     fetchProjects();
     fetchServices();
     fetchOrders();
+    fetchCustomerCarts();
   }, []);
+
+  const fetchCustomerCarts = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/admin/carts`, { headers: authHeaders() });
+      const data = await res.json();
+      if (res.ok) setCustomerCarts(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchOrders = async () => {
     try {
@@ -154,7 +166,25 @@ const AdminDashboard = () => {
           >
             Track Orders ({orders.length})
           </button>
+          <button
+            onClick={() => setActiveTab('carts')}
+            className={`px-4 py-2 rounded font-semibold ${activeTab === 'carts' ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+          >
+            View Customer Carts ({customerCarts.length})
+          </button>
         </div>
+
+        {activeTab === 'carts' && (
+          <div>
+            <h2 className="text-xl font-semibold mb-4 text-gray-700">Customer Carts</h2>
+            {customerCarts.length === 0 ? <p className="text-gray-500">No customer has added items to a cart yet.</p> : <div className="space-y-4">{customerCarts.map((cart) => (
+              <div key={cart._id} className="border rounded-lg p-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3"><div><h3 className="font-bold">{cart.user?.name || 'Customer'}</h3><p className="text-sm text-gray-500">{cart.user?.email || 'No email'}</p></div><span className="text-sm text-gray-600">{cart.items.length} selected item(s)</span></div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">{cart.items.map((item) => <div key={item.productId} className="flex items-center gap-3 bg-gray-50 rounded p-2"><img src={item.thumbnail} alt={item.title} className="w-12 h-12 rounded object-cover" /><div><p className="font-semibold text-sm">{item.title}</p><p className="text-xs text-gray-500">Quantity: {item.quantity}</p></div></div>)}</div>
+              </div>
+            ))}</div>}
+          </div>
+        )}
 
         {activeTab === 'orders' && (
           <div>

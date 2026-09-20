@@ -9,6 +9,7 @@ import { AuthContext, isAdminUser } from '../context/AuthContext';
 const Gallery = () => {
   const [filter, setFilter] = useState('All');
   const [allProjects, setAllProjects] = useState(projectsData);
+  const [selectedProject, setSelectedProject] = useState(null);
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const canAddToCart = Boolean(user) && !isAdminUser(user);
@@ -41,6 +42,11 @@ const Gallery = () => {
     ? allProjects 
     : allProjects.filter(p => p.category.toLowerCase() === filter.toLowerCase());
 
+  const openProjectFeatures = (project) => {
+    setSelectedProject(project);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleCartAction = async (project, orderNow = false) => {
     if (!canAddToCart) {
       toast.info(user ? 'Admins can manage orders but cannot use the customer cart.' : 'Please sign in to add items to your cart.');
@@ -62,6 +68,7 @@ const Gallery = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Unable to add this item.');
       toast.success('Item added to your cart.');
+      setSelectedProject(null);
       if (orderNow) navigate('/dashboard');
     } catch (error) { toast.error(error.message || 'Unable to add this item to your cart.'); }
   };
@@ -134,14 +141,36 @@ const Gallery = () => {
                   {project.category}
                 </span>
                 {canAddToCart && <div className="flex gap-2 mt-3" onClick={(event) => event.preventDefault()}>
-                  <button onClick={() => handleCartAction(project)} className="flex-1 py-2 bg-secondary text-white rounded text-xs font-semibold">Add to Cart</button>
-                  <button onClick={() => handleCartAction(project, true)} className="flex-1 py-2 bg-primary text-white rounded text-xs font-semibold">Order Now</button>
+                  <button onClick={() => openProjectFeatures(project)} className="flex-1 py-2 bg-secondary text-white rounded text-xs font-semibold">Add to Cart</button>
+                  <button onClick={() => openProjectFeatures(project)} className="flex-1 py-2 bg-primary text-white rounded text-xs font-semibold">Order Now</button>
                 </div>}
               </div>
             </Link>
           </motion.div>
         ))}
       </div>
+
+      {selectedProject && canAddToCart && (
+        <section className="max-w-3xl mx-auto mt-10 bg-white border border-secondary/30 rounded-xl shadow-lg p-6" aria-live="polite">
+          <div className="flex flex-col sm:flex-row gap-5">
+            <img src={selectedProject.thumbnail} alt={selectedProject.title} className="w-full sm:w-48 h-36 object-cover rounded-lg" />
+            <div className="flex-1">
+              <span className="text-xs uppercase tracking-wide text-secondary font-semibold">Product Details</span>
+              <h2 className="text-2xl font-bold text-primary mt-1">{selectedProject.title}</h2>
+              <p className="text-gray-600 mt-2">{selectedProject.description || 'Professional engineering equipment built for reliable industrial performance.'}</p>
+              <ul className="mt-3 list-disc list-inside text-sm text-gray-600 space-y-1">
+                <li>Industrial-grade construction</li>
+                <li>Built for reliable production performance</li>
+                <li>Suitable for custom engineering requirements</li>
+              </ul>
+            </div>
+          </div>
+          <div className="flex gap-3 mt-6">
+            <button onClick={() => handleCartAction(selectedProject)} className="flex-1 py-3 bg-secondary text-white rounded-lg font-semibold">Add to Cart</button>
+            <button onClick={() => setSelectedProject(null)} className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold">Cancel</button>
+          </div>
+        </section>
+      )}
 
       {/* No Projects Found */}
       {filteredProjects.length === 0 && (
