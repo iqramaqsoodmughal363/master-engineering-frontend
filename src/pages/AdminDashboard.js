@@ -3,7 +3,7 @@ import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://aster-engineering-backend.vercel.app';
+const API_URL = process.env.REACT_APP_API_URL || 'https://master-engineering-api.vercel.app';
 
 const AdminDashboard = () => {
   const { user, logout } = useContext(AuthContext);

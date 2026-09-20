@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext();
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://aster-engineering-backend.vercel.app';
+const API_URL = process.env.REACT_APP_API_URL || 'https://master-engineering-api.vercel.app';
 export const ADMIN_EMAILS = [
   'masterengineeringworks@gmail.com',
   'iqra03010511199@gmail.com',
