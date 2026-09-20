@@ -14,6 +14,7 @@ import GalleryDetail from './pages/GalleryDetail';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
 
 // Admin Imports with Safety Fallback
 import AdminDashboard from './pages/AdminDashboard';
@@ -35,6 +36,7 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
 
               {/* Safe Admin Protected Route */}
               <Route

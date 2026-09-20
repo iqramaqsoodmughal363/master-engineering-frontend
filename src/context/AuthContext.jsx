@@ -103,3 +103,20 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+export const requestPasswordReset = async (email) => {
+  const response = await fetch(`${API_URL}/api/auth/forgot-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email }),
+  });
+  const data = await readResponse(response);
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Unable to send the reset link. Please try again.');
+  }
+
+  return data;
+};
