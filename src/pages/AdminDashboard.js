@@ -92,7 +92,7 @@ const AdminDashboard = () => {
       setOrders((current) => current.map((order) => order._id === orderId ? data.order : order));
       toast.success('Order status updated successfully.');
     } catch (error) {
-      toast.error(error instanceof TypeError ? 'Unable to connect to the server. Please try again.' : (error.message || 'Unable to update order status.'));
+      toast.error(error instanceof TypeError ? `Unable to connect to the server at ${API_URL}. Please redeploy the backend and try again.` : (error.message || 'Unable to update order status.'));
     }
   };
 
