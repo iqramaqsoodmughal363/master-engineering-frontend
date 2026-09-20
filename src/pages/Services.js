@@ -38,10 +38,10 @@ const Services = () => {
     {
       id: 2,
       icon: <FaCut className="text-4xl" />,
-      title: 'Precision Blades',
+      title: 'Industrial Cutting Tools',
       category: 'Manufacturing',
-      shortDesc: 'Robust blades for industrial application',
-      description: 'Our precision blades are manufactured with high-grade materials to deliver exceptional cutting performance and durability. We produce blades for various industrial applications including metal cutting, paper processing, and food processing industries.',
+      shortDesc: 'High-durability cutting blades and tooling solutions',
+      description: 'High-durability cutting blades and tooling solutions engineered for heavy-duty industrial applications.',
       features: [
         'High-grade material selection',
         'Precision grinding and sharpening',
@@ -54,10 +54,10 @@ const Services = () => {
     {
       id: 3,
       icon: <FaIndustry className="text-4xl" />,
-      title: 'Cubical Bladder Machines',
+      title: 'Modular Industrial Machinery',
       category: 'Manufacturing',
-      shortDesc: 'Manufacturing and repair of specialized parts',
-      description: 'We specialize in manufacturing and repairing cubical bladder machines and their specialized components. Our expertise covers complete machine manufacturing, component replacement, and comprehensive repair services to ensure optimal machine performance.',
+      shortDesc: 'Advanced custom-built machinery for production lines',
+      description: 'Advanced custom-built machinery designed for high-efficiency manufacturing and production lines.',
       features: [
         'Complete machine manufacturing',
         'Specialized component production',

@@ -4,8 +4,8 @@ import { FaCog, FaCut, FaIndustry, FaTools, FaWrench, FaPencilAlt } from 'react-
 const ServicesSection = () => {
   const services = [
     { icon: <FaCog size={40} />, title: 'Custom Gear Manufacturing', description: 'High-precision fabrication' },
-    { icon: <FaCut size={40} />, title: 'Precision Blades', description: 'Robust blades for industrial application' },
-    { icon: <FaIndustry size={40} />, title: 'Cubical Bladder Machines', description: 'Manufacturing and repair' },
+    { icon: <FaCut size={40} />, title: 'Industrial Cutting Tools', description: 'High-durability cutting blades and tooling solutions engineered for heavy-duty industrial applications.' },
+    { icon: <FaIndustry size={40} />, title: 'Modular Industrial Machinery', description: 'Advanced custom-built machinery designed for high-efficiency manufacturing and production lines.' },
     { icon: <FaWrench size={40} />, title: 'Heavy Repair', description: 'Expert Hopper repair & overhauling' },
     { icon: <FaPencilAlt size={40} />, title: 'Structural Work', description: 'Piping fabrication & structural jobs' },
     { icon: <FaTools size={40} />, title: 'Custom Shafts', description: 'Precision turning and grinding' },
