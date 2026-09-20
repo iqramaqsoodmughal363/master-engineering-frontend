@@ -32,7 +32,9 @@ const Login = () => {
       toast.success('Successfully logged in!');
       navigate(isAdminUser(data.user) ? '/admin/dashboard' : '/');
     } catch (err) {
-      const errMsg = err.message || 'Invalid email or password.';
+      const errMsg = err.message === 'Unable to reach the server. Please try again.'
+        ? err.message
+        : 'Invalid email or password!';
       setErrorMsg(errMsg);
       toast.error(errMsg);
     } finally {
