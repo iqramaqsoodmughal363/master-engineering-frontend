@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FaBars, FaTimes } from 'react-icons/fa';
+import { AuthContext, isAdminUser } from '../../context/AuthContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { user } = useContext(AuthContext);
 
   const links = [
     { name: 'Home', path: '/' },
@@ -12,7 +14,7 @@ const Navbar = () => {
     { name: 'Services', path: '/services' },
     { name: 'Gallery', path: '/gallery' },
     { name: 'Contact', path: '/contact' },
-    { name: 'Login', path: '/login' },
+    ...(user ? [{ name: 'Dashboard', path: isAdminUser(user) ? '/admin/dashboard' : '/dashboard' }, { name: 'Cart', path: '/cart' }] : [{ name: 'Login', path: '/login' }]),
   ];
 
   const isActive = (path) => location.pathname === path;

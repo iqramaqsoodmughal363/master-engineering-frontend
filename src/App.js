@@ -20,6 +20,8 @@ import ResetPassword from './pages/ResetPassword';
 // Admin Imports with Safety Fallback
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import UserRoute from './components/common/UserRoute';
+import UserDashboard from './pages/UserDashboard';
 
 function App() {
   return (
@@ -39,6 +41,8 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password/:token" element={<ResetPassword />} />
+              <Route path="/dashboard" element={<UserRoute><UserDashboard /></UserRoute>} />
+              <Route path="/cart" element={<UserRoute><UserDashboard /></UserRoute>} />
 
               {/* Safe Admin Protected Route */}
               <Route

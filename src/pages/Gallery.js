@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 import { projectsData } from '../date/projectsData';
 import API from '../api/axios';
@@ -7,6 +8,7 @@ import API from '../api/axios';
 const Gallery = () => {
   const [filter, setFilter] = useState('All');
   const [allProjects, setAllProjects] = useState(projectsData);
+  const navigate = useNavigate();
 
   const categories = ['All', 'Manufacturing', 'Heavy Repair', 'Structural', 'Blades', 'Bladder Machines', 'Custom Built'];
 
@@ -35,6 +37,26 @@ const Gallery = () => {
   const filteredProjects = filter === 'All' 
     ? allProjects 
     : allProjects.filter(p => p.category.toLowerCase() === filter.toLowerCase());
+
+  const handleCartAction = async (project, orderNow = false) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.info('Please sign in to add items to your cart.');
+      navigate('/login');
+      return;
+    }
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'https://master-engineering-api.vercel.app'}/api/cart/items`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ productId: project.id, title: project.title, thumbnail: project.thumbnail, category: project.category }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Unable to add this item.');
+      toast.success('Item added to your cart.');
+      if (orderNow) navigate('/dashboard');
+    } catch (error) { toast.error(error.message || 'Unable to add this item to your cart.'); }
+  };
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -103,6 +125,10 @@ const Gallery = () => {
                 <span className="inline-block mt-1 text-xs bg-secondary/10 text-secondary px-3 py-1 rounded-full">
                   {project.category}
                 </span>
+                <div className="flex gap-2 mt-3" onClick={(event) => event.preventDefault()}>
+                  <button onClick={() => handleCartAction(project)} className="flex-1 py-2 bg-secondary text-white rounded text-xs font-semibold">Add to Cart</button>
+                  <button onClick={() => handleCartAction(project, true)} className="flex-1 py-2 bg-primary text-white rounded text-xs font-semibold">Order Now</button>
+                </div>
               </div>
             </Link>
           </motion.div>

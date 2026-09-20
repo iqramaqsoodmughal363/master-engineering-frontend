@@ -25,6 +25,7 @@ const AdminDashboard = () => {
   // Lists
   const [projects, setProjects] = useState([]);
   const [services, setServices] = useState([]);
+  const [orders, setOrders] = useState([]);
   const authHeaders = () => {
     const token = localStorage.getItem('token');
     return token ? { Authorization: `Bearer ${token}` } : {};
@@ -34,7 +35,18 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchProjects();
     fetchServices();
+    fetchOrders();
   }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/orders`, { headers: authHeaders() });
+      const data = await res.json();
+      if (res.ok) setOrders(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchProjects = async () => {
     try {
@@ -136,7 +148,25 @@ const AdminDashboard = () => {
           >
             Manage Services
           </button>
+          <button
+            onClick={() => setActiveTab('orders')}
+            className={`px-4 py-2 rounded font-semibold ${activeTab === 'orders' ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+          >
+            Track Orders ({orders.length})
+          </button>
         </div>
+
+        {activeTab === 'orders' && (
+          <div>
+            <h2 className="text-xl font-semibold mb-4 text-gray-700">Customer Orders</h2>
+            {orders.length === 0 ? <p className="text-gray-500">No customer orders have been placed yet.</p> : <div className="space-y-3">{orders.map((order) => (
+              <div key={order._id} className="border rounded-lg p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div><h3 className="font-bold">Order #{order._id.slice(-6).toUpperCase()}</h3><p className="text-sm text-gray-600">{order.user?.name || 'Customer'} ({order.user?.email || 'No email'})</p><p className="text-sm text-gray-500">{order.items.length} item(s) • {new Date(order.createdAt).toLocaleDateString()}</p></div>
+                <span className="font-semibold text-amber-600">{order.status}</span>
+              </div>
+            ))}</div>}
+          </div>
+        )}
 
         {/* Projects Tab */}
         {activeTab === 'projects' && (
