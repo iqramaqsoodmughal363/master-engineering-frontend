@@ -91,7 +91,9 @@ const AdminDashboard = () => {
       if (!res.ok) throw new Error(data.message || 'Unable to update order status.');
       setOrders((current) => current.map((order) => order._id === orderId ? data.order : order));
       toast.success('Order status updated successfully.');
-    } catch (error) { toast.error(error.message || 'Unable to update order status.'); }
+    } catch (error) {
+      toast.error(error instanceof TypeError ? 'Unable to connect to the server. Please try again.' : (error.message || 'Unable to update order status.'));
+    }
   };
 
   // Handle Project Submit
