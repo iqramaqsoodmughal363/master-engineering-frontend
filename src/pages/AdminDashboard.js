@@ -80,6 +80,20 @@ const AdminDashboard = () => {
     }
   };
 
+  const updateOrderStatus = async (orderId, status) => {
+    try {
+      const res = await fetch(`${API_URL}/api/orders/${orderId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        body: JSON.stringify({ status }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Unable to update order status.');
+      setOrders((current) => current.map((order) => order._id === orderId ? data.order : order));
+      toast.success('Order status updated successfully.');
+    } catch (error) { toast.error(error.message || 'Unable to update order status.'); }
+  };
+
   // Handle Project Submit
   const handleProjectSubmit = async (e) => {
     e.preventDefault();
@@ -189,12 +203,7 @@ const AdminDashboard = () => {
         {activeTab === 'orders' && (
           <div>
             <h2 className="text-xl font-semibold mb-4 text-gray-700">Customer Orders</h2>
-            {orders.length === 0 ? <p className="text-gray-500">No customer orders have been placed yet.</p> : <div className="space-y-3">{orders.map((order) => (
-              <div key={order._id} className="border rounded-lg p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div><h3 className="font-bold">Order #{order._id.slice(-6).toUpperCase()}</h3><p className="text-sm text-gray-600">{order.user?.name || 'Customer'} ({order.user?.email || 'No email'})</p><p className="text-sm text-gray-500">{order.items.length} item(s) • {new Date(order.createdAt).toLocaleDateString()}</p></div>
-                <span className="font-semibold text-amber-600">{order.status}</span>
-              </div>
-            ))}</div>}
+            {orders.length === 0 ? <p className="text-gray-500">No customer orders have been placed yet.</p> : <div className="overflow-x-auto"><table className="w-full text-left"><thead><tr className="border-b text-sm text-gray-500"><th className="py-3 pr-4">Order</th><th className="py-3 pr-4">Customer</th><th className="py-3 pr-4">Contact</th><th className="py-3 pr-4">Items</th><th className="py-3 pr-4">Status</th><th className="py-3">Update</th></tr></thead><tbody>{orders.map((order) => <tr key={order._id} className="border-b last:border-0 align-top"><td className="py-4 pr-4 font-semibold">#{order._id.slice(-6).toUpperCase()}<p className="text-xs text-gray-500 mt-1">{new Date(order.createdAt).toLocaleDateString()}</p></td><td className="py-4 pr-4"><p className="font-semibold">{order.customer?.name || order.user?.name || 'Customer'}</p><p className="text-xs text-gray-500">{order.user?.email || 'No email'}</p></td><td className="py-4 pr-4 text-sm"><p>{order.customer?.phone || 'No phone'}</p><p className="max-w-xs text-gray-500">{order.customer?.address || 'No address'}</p></td><td className="py-4 pr-4 text-sm">{order.items.map((item) => <div key={item.productId}>{item.title} x {item.quantity}</div>)}</td><td className="py-4 pr-4"><span className="font-semibold text-amber-600">{order.status}</span></td><td className="py-4"><select value={order.status} onChange={(event) => updateOrderStatus(order._id, event.target.value)} className="border rounded px-2 py-2 text-sm"><option value="Pending">Pending</option><option value="Confirmed">Confirmed</option><option value="In Progress">In Progress</option><option value="Completed">Complete</option></select></td></tr>)}</tbody></table></div>}
           </div>
         )}
 

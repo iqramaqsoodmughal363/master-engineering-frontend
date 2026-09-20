@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaMinus, FaPlus, FaShoppingCart, FaSignOutAlt } from 'react-icons/fa';
+import { FaMinus, FaPlus, FaShoppingCart, FaSignOutAlt, FaTrash } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 import { projectsData } from '../date/projectsData';
@@ -82,6 +82,17 @@ const UserDashboard = () => {
     finally { setIsSubmitting(false); }
   };
 
+  const cancelOrder = async (orderId) => {
+    if (!window.confirm('Are you sure you want to cancel this pending order?')) return;
+    try {
+      const response = await fetch(`${API_URL}/api/orders/${orderId}`, { method: 'DELETE', headers: headers() });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Unable to cancel this order.');
+      setOrders((current) => current.filter((order) => order._id !== orderId));
+      toast.success('Order cancelled successfully.');
+    } catch (error) { toast.error(error.message || 'Unable to cancel this order.'); }
+  };
+
   const signOut = () => { logout(); navigate('/login'); };
 
   if (isLoading) return <div className="text-center py-20 font-semibold text-gray-600">Loading your dashboard...</div>;
@@ -107,7 +118,7 @@ const UserDashboard = () => {
 
         {cart.items.length > 0 && <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8"><h2 className="text-2xl font-bold text-primary mb-5">Place Your Order</h2><form onSubmit={placeOrder} className="grid grid-cols-1 md:grid-cols-3 gap-4"><input className="border rounded-lg px-4 py-3" placeholder="Full name" value={customer.name} onChange={(event) => setCustomer({ ...customer, name: event.target.value })} required /><input className="border rounded-lg px-4 py-3" placeholder="Phone number" value={customer.phone} onChange={(event) => setCustomer({ ...customer, phone: event.target.value })} required /><input className="border rounded-lg px-4 py-3" placeholder="Delivery address" value={customer.address} onChange={(event) => setCustomer({ ...customer, address: event.target.value })} required /><button disabled={isSubmitting} className="md:col-span-3 py-3 bg-primary text-white rounded-lg font-semibold disabled:opacity-50">{isSubmitting ? 'Placing Order...' : 'Place Order'}</button></form></section>}
 
-        <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"><h2 className="text-2xl font-bold text-primary mb-5">Order History</h2>{orders.length === 0 ? <p className="text-gray-500">You have not placed any orders yet.</p> : <div className="space-y-3">{orders.map((order) => <div key={order._id} className="border rounded-lg p-4 flex flex-col sm:flex-row justify-between gap-2"><div><p className="font-semibold">Order #{order._id.slice(-6).toUpperCase()}</p><p className="text-sm text-gray-500">{order.items.length} item(s) • {new Date(order.createdAt).toLocaleDateString()}</p></div><span className="text-secondary font-semibold">{order.status}</span></div>)}</div>}</section>
+        <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"><h2 className="text-2xl font-bold text-primary mb-5">Order History</h2>{orders.length === 0 ? <p className="text-gray-500">You have not placed any orders yet.</p> : <div className="overflow-x-auto"><table className="w-full text-left"><thead><tr className="border-b text-sm text-gray-500"><th className="py-3 pr-4">Order</th><th className="py-3 pr-4">Items</th><th className="py-3 pr-4">Date</th><th className="py-3 pr-4">Status</th><th className="py-3">Action</th></tr></thead><tbody>{orders.map((order) => <tr key={order._id} className="border-b last:border-0"><td className="py-4 pr-4 font-semibold">#{order._id.slice(-6).toUpperCase()}</td><td className="py-4 pr-4">{order.items.map((item) => <div key={item.productId} className="text-sm">{item.title} x {item.quantity}</div>)}</td><td className="py-4 pr-4 text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</td><td className="py-4 pr-4"><span className="text-secondary font-semibold">{order.status}</span></td><td className="py-4">{order.status === 'Pending' ? <button onClick={() => cancelOrder(order._id)} className="inline-flex items-center gap-2 text-red-600 hover:text-red-800 font-semibold"><FaTrash /> Delete</button> : <span className="text-sm text-gray-400">Locked</span>}</td></tr>)}</tbody></table></div>}</section>
       </div>
     </div>
   );
